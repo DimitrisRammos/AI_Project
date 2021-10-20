@@ -114,6 +114,9 @@ def depthFirstSearch(problem):
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     """
 
+    # print("Start:", problem.getStartState())
+    # print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
+
     start = problem.getStartState()
     List = []
     visited = {}
@@ -124,31 +127,79 @@ def depthFirstSearch(problem):
     #for the start
     visited[start] = True
     stack.push((start,"NULL"))
-    
+    exp = {}
     while stack.isEmpty() == False:
         st,ac = stack.pop()
-        if ac != "NULL":
-            List.append(ac)
+        
+        List.append((st,ac))
 
         
         visited[st] = True
         
         if problem.isGoalState(st) == True:
-            print ("elaaa")
+            # print ("elaaa")
             break
 
         li = problem.expand( st)
+        exp[st] = li
         
         for state,action,co in li:
             if state in visited:
-                continue
-            else:
+                if visited[state] == True:
+                    continue
 
-                visited[state] = False
-                stack.push( (state,action))
-        
+            visited[state] = False
+            stack.push( (state,action))
+      
+    # print( List)
     
-    return List
+    List.reverse()
+    # print(List)
+# print("\n"*10)
+    i = 0
+    Li = []
+    while i < len(List):
+        
+        state,action = List[i]
+# print( state, action)
+        if problem.isGoalState(state) == True:
+            # print( len(problem.getActions(state)))
+            previous_state = state
+            previous_action = action
+            i +=1
+            continue
+        
+# print( state,"e;aa")
+        if state == start:
+    # print(state,"dsssss",previous_action)
+            Li.append(previous_action)
+            break
+        
+        # st = problem.getNextState(state, previous_action)
+        # print(st)
+        list_with_child = exp[state]
+        result = False
+        for state_n,action_n,cost_n in list_with_child:
+            if state_n == previous_state and previous_action == action_n:
+# print( state,action,"eimai sto true")
+                result = True
+
+        if result == True:
+# print("kapa")
+            # print(state)
+            # if len(problem.getActions(state)) > 1:
+# print("opaaa")
+            Li.append(previous_action)
+# print(state,action,previous_action)
+            previous_state = state
+            previous_action = action
+                # s.push( action)
+        
+        i = i + 1
+
+    Li.reverse()
+# print("APOTELESMA AC",Li)
+    return Li
     "*** YOUR CODE HERE ***"
     util.raiseNotDefined()
 
