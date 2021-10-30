@@ -17,7 +17,9 @@ In search.py, you will implement generic search algorithms which are called by
 Pacman agents (in searchAgents.py).
 """
 
+from os import PRIO_USER
 import util
+import math
 
 class SearchProblem:
     """
@@ -137,7 +139,6 @@ def depthFirstSearch(problem):
         visited[st] = True
         
         if problem.isGoalState(st) == True:
-            # print ("elaaa")
             break
 
         li = problem.expand( st)
@@ -150,55 +151,46 @@ def depthFirstSearch(problem):
 
             visited[state] = False
             stack.push( (state,action))
-      
-    # print( List)
-    
+
+    #reverse the list
     List.reverse()
-    # print(List)
-# print("\n"*10)
+
     i = 0
     Li = []
     while i < len(List):
         
         state,action = List[i]
-# print( state, action)
+
+        #if it is the goal
         if problem.isGoalState(state) == True:
-            # print( len(problem.getActions(state)))
+
             previous_state = state
             previous_action = action
             i +=1
             continue
         
-# print( state,"e;aa")
+        #we have reverse the list, if we find the start than STOP
         if state == start:
-    # print(state,"dsssss",previous_action)
             Li.append(previous_action)
             break
         
-        # st = problem.getNextState(state, previous_action)
-        # print(st)
+
         list_with_child = exp[state]
         result = False
         for state_n,action_n,cost_n in list_with_child:
             if state_n == previous_state and previous_action == action_n:
-# print( state,action,"eimai sto true")
                 result = True
 
         if result == True:
-# print("kapa")
-            # print(state)
-            # if len(problem.getActions(state)) > 1:
-# print("opaaa")
+
             Li.append(previous_action)
-# print(state,action,previous_action)
             previous_state = state
             previous_action = action
-                # s.push( action)
         
         i = i + 1
 
     Li.reverse()
-# print("APOTELESMA AC",Li)
+    
     return Li
     "*** YOUR CODE HERE ***"
     util.raiseNotDefined()
@@ -207,6 +199,76 @@ def depthFirstSearch(problem):
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
+    start = problem.getStartState()
+    List = []
+    visited = {}
+
+    #Stack
+    queue = util.Queue()
+
+    #for the start
+    visited[start] = True
+    queue.push((start,"NULL"))
+    exp = {}
+
+    while queue.isEmpty() == False:
+        st,ac = queue.pop()
+
+        List.append((st,ac))
+
+        if problem.isGoalState(st) == True:
+            List.append((st,ac))
+            break
+        
+        visited[st] = True
+    
+        li = problem.expand( st)
+        exp[st] = li
+        
+        for state,action,co in li:
+            if state in visited:
+                    continue
+
+            visited[state] = False
+            queue.push( (state,action))
+
+    #reverse the list from bfs
+    List.reverse()
+
+    i = 0
+    Li = []
+    while i < len(List):
+        
+        state,action = List[i]
+
+        if problem.isGoalState(state) == True:
+            previous_state = state
+            previous_action = action
+            i +=1
+            continue
+
+
+        if state == start:
+            Li.append(previous_action)
+            break
+
+
+        list_with_child = exp[state]
+        result = False
+        for state_n,action_n,cost_n in list_with_child:
+            if state_n == previous_state and previous_action == action_n:
+                result = True
+
+        if result == True:
+            Li.append(previous_action)
+            previous_state = state
+            previous_action = action
+        
+        i = i + 1
+
+    Li.reverse()
+    
+    return Li
     util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
@@ -219,6 +281,95 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
+    
+    start = problem.getStartState()
+    visited = {}
+
+    #Stack
+    queue = util.Queue()
+
+    #for the start
+    visited[start] = True
+    #from_start is dictionaries with distance from start state and this state( withn't)
+    from_start = {}
+    from_start[start] = 0
+    
+    list_close = {}
+    list_open = {}
+    list_open[start] = (0 + heuristic(start,problem), None, None)
+    min_num = math.inf
+    min_element = start
+
+    #from the node where is expand(not double expand in one node)
+    exp = {}
+    Goal = None
+
+    while len(list_open) != 0:
+
+        state_parent = min_element
+        tup = list_open[state_parent]
+
+        if problem.isGoalState(state_parent) == True:
+            Goal = state_parent
+            list_close[state_parent] = tup 
+            break
+        
+        li = problem.expand( state_parent)
+        exp[state_parent] = li
+
+        for state,action,cost in li:
+            if state in visited:
+
+                if from_start[state_parent] + cost < from_start[state]:
+                    from_start[state] = from_start[state] + cost
+                    list_close[state] = (from_start[state] + heuristic(state,problem), state_parent,action)
+                continue
+            
+            if state in list_open:
+
+                if from_start[state_parent] + cost < from_start[state]:
+                    from_start[state] = from_start[state_parent] + cost
+                    list_open[state] = (from_start[state] + heuristic(state,problem), state_parent,action)
+            else:
+                from_start[state] = from_start[state_parent] + cost
+                list_open[state] = (from_start[state] + heuristic(state,problem),state_parent,action)
+
+
+            if cost < min_num:
+                min_num = cost
+                min_element = state
+
+        #delete state from open list and transfer ---> in close List
+        del list_open[state_parent]
+        list_close[state_parent] = tup
+        visited[state_parent] = True
+
+        if min_element == state_parent:
+            min_num = math.inf
+
+
+            for st in list_open:
+            
+            
+                tu = list_open[st]
+                cost, before_state,ac = tu
+            
+            
+                if cost < min_num:
+                    min_num = cost
+                    min_element = st
+
+    state = Goal
+    Li = []
+    while state != start:
+        cost, state_parent, action = tup = list_close[state]
+        state = state_parent
+        Li.append(action)
+
+
+    Li.reverse()
+    return Li
+
     util.raiseNotDefined()
 
 
