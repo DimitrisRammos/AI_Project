@@ -217,7 +217,6 @@ def breadthFirstSearch(problem):
         List.append((st,ac))
 
         if problem.isGoalState(st) == True:
-            List.append((st,ac))
             break
         
         visited[st] = True
@@ -234,21 +233,25 @@ def breadthFirstSearch(problem):
 
     #reverse the list from bfs
     List.reverse()
-
     i = 0
     Li = []
+    # print(List)
+    # util.raiseNotDefined()
+    print("START     ",start)
     while i < len(List):
         
         state,action = List[i]
 
         if problem.isGoalState(state) == True:
+            print("Goal     ",state,action)
             previous_state = state
             previous_action = action
             i +=1
             continue
-
-
+        # print(state)
+        
         if state == start:
+            # print("find")
             Li.append(previous_action)
             break
 
@@ -256,18 +259,28 @@ def breadthFirstSearch(problem):
         list_with_child = exp[state]
         result = False
         for state_n,action_n,cost_n in list_with_child:
+            # print("edoooo")
             if state_n == previous_state and previous_action == action_n:
-                result = True
+                print("gia patera", state, "    vrika ",state_n, previous_state,action_n,"\n\n")
+                Li.append(previous_action)
+                previous_state = state
+                previous_action = action
+                # result = True
+                
+                break
 
-        if result == True:
-            Li.append(previous_action)
-            previous_state = state
-            previous_action = action
+        # if result == True:
+        #     print("eimai sto reverse    ",state)
+        #     Li.append(previous_action)
+        #     previous_state = state
+        #     previous_action = action
         
         i = i + 1
 
+    print("last")
+    print(Li)
     Li.reverse()
-    
+    print(Li)
     return Li
     util.raiseNotDefined()
 

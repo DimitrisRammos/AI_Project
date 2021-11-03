@@ -34,6 +34,7 @@ description for details.
 Good luck and happy searching!
 """
 
+from os import PRIO_PGRP
 from game import Directions
 from game import Agent
 from game import Actions
@@ -308,6 +309,11 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
+        
+        self._node_corners = 0
+        self.goal = {}
+        self.goal_is = None
+
 
     def getStartState(self):
         """
@@ -315,6 +321,8 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
+        # print("pame", self.startingPosition)
+        return (self.startingPosition,0)
         util.raiseNotDefined()
 
     def isGoalState(self, state):
@@ -322,6 +330,26 @@ class CornersProblem(search.SearchProblem):
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
+        isGoal = False
+
+        for i in range(4):
+            # print( self.corners[i])
+            if self.corners[i] == state[0]:
+                # print(state, self._node_corners)
+                # isGoal = True
+                
+                if state[0] not in self.goal:
+                    self.goal[state[0]] = True
+
+                    if len(self.goal) == len(self.corners):
+                        self.goal_is = state[0]
+                break
+        
+        if self.goal_is == state[0]:
+            isGoal = True
+
+
+        return isGoal
         util.raiseNotDefined()
 
     def expand(self, state):
@@ -334,14 +362,19 @@ class CornersProblem(search.SearchProblem):
             state, 'action' is the action required to get there, and 'stepCost'
             is the incremental cost of expanding to that child
         """
-
+        print(state)
         children = []
         for action in self.getActions(state):
             # Add a child state to the child list if the action is legal
             # You should call getActions, getActionCost, and getNextState.
             "*** YOUR CODE HERE ***"
+            nextState = self.getNextState(state,action)
+            print("CHild            ",nextState)
+            cost = self.getActionCost(state, action, nextState)
+            children.append(( nextState, action, cost))
 
         self._expanded += 1 # DO NOT CHANGE
+        
         return children
 
     def getActions(self, state):
@@ -367,7 +400,15 @@ class CornersProblem(search.SearchProblem):
         dx, dy = Actions.directionToVector(action)
         nextx, nexty = int(x + dx), int(y + dy)
         "*** YOUR CODE HERE ***"
+
+
+        state_n = (nextx,nexty)
+        num = len(self.goal)
+        next_state = (state_n, num)
+
+        return next_state
         util.raiseNotDefined()
+
 
     def getCostOfActionSequence(self, actions):
         """
