@@ -219,14 +219,22 @@ def breadthFirstSearch(problem):
         if problem.isGoalState(st) == True:
             break
         
+        #komboi poy xo episkeftei
         visited[st] = True
     
+        #apothikeyo tin lista apo expand se ena dactionary oste na 
+        #min xriazetai na ksanakalo
         li = problem.expand( st)
         exp[st] = li
         
+        #gia kathe paidi
+
         for state,action,co in li:
+            #an to xo episkeftei pao parkato
             if state in visited:
                     continue
+            
+            #allios to vazpt stin oyra mazi me action, to action apla gai meta
 
             visited[state] = False
             queue.push( (state,action))
@@ -235,52 +243,42 @@ def breadthFirstSearch(problem):
     List.reverse()
     i = 0
     Li = []
-    # print(List)
-    # util.raiseNotDefined()
-    print("START     ",start)
+
+    
     while i < len(List):
-        
+ 
         state,action = List[i]
 
+
         if problem.isGoalState(state) == True:
-            print("Goal     ",state,action)
             previous_state = state
             previous_action = action
             i +=1
             continue
-        # print(state)
+
+
         
         if state == start:
-            # print("find")
             Li.append(previous_action)
             break
 
 
         list_with_child = exp[state]
-        result = False
         for state_n,action_n,cost_n in list_with_child:
-            # print("edoooo")
+
             if state_n == previous_state and previous_action == action_n:
-                print("gia patera", state, "    vrika ",state_n, previous_state,action_n,"\n\n")
+                print("gia patera", state, "  vrika ",previous_state,action_n,"\n\n")
                 Li.append(previous_action)
                 previous_state = state
                 previous_action = action
-                # result = True
-                
+             
                 break
 
-        # if result == True:
-        #     print("eimai sto reverse    ",state)
-        #     Li.append(previous_action)
-        #     previous_state = state
-        #     previous_action = action
         
         i = i + 1
 
-    print("last")
     print(Li)
     Li.reverse()
-    print(Li)
     return Li
     util.raiseNotDefined()
 

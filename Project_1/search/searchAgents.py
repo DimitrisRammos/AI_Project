@@ -330,26 +330,11 @@ class CornersProblem(search.SearchProblem):
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        isGoal = False
 
-        for i in range(4):
-            # print( self.corners[i])
-            if self.corners[i] == state[0]:
-                # print(state, self._node_corners)
-                # isGoal = True
-                
-                if state[0] not in self.goal:
-                    self.goal[state[0]] = True
-
-                    if len(self.goal) == len(self.corners):
-                        self.goal_is = state[0]
-                break
-        
-        if self.goal_is == state[0]:
-            isGoal = True
-
-
-        return isGoal
+        if len(self.goal) == len(self.corners) and self.goal_is == state[0]:
+            return True
+            
+        return False
         util.raiseNotDefined()
 
     def expand(self, state):
@@ -362,17 +347,21 @@ class CornersProblem(search.SearchProblem):
             state, 'action' is the action required to get there, and 'stepCost'
             is the incremental cost of expanding to that child
         """
-        print(state)
+        print("Father   ",state, "\n\n")
+
+
         children = []
         for action in self.getActions(state):
             # Add a child state to the child list if the action is legal
             # You should call getActions, getActionCost, and getNextState.
             "*** YOUR CODE HERE ***"
+
+
             nextState = self.getNextState(state,action)
-            print("CHild            ",nextState)
+            print("CH ", nextState, end="   ")
             cost = self.getActionCost(state, action, nextState)
             children.append(( nextState, action, cost))
-
+        print(end="\n")
         self._expanded += 1 # DO NOT CHANGE
         
         return children
@@ -401,12 +390,31 @@ class CornersProblem(search.SearchProblem):
         nextx, nexty = int(x + dx), int(y + dy)
         "*** YOUR CODE HERE ***"
 
+        state_next = (nextx,nexty)
 
-        state_n = (nextx,nexty)
+        for i in range(4):
+            # print( self.corners[i])
+            if self.corners[i] == state_next:
+                # print(state, self._node_corners)
+                # isGoal = True
+                
+                if state_next not in self.goal:
+                    self.goal[state_next] = True
+                    if len(self.goal) == len(self.corners):
+                        self.goal_is = state_next
+                
+                
+                break
+        
+
         num = len(self.goal)
-        next_state = (state_n, num)
+        if num ==2 :
+            print(state_next, state)
+            util.raiseNotDefined()
 
-        return next_state
+        # next_state = (state_n, num)
+
+        return ( state_next, num)
         util.raiseNotDefined()
 
 
