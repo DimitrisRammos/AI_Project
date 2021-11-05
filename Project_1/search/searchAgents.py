@@ -313,6 +313,7 @@ class CornersProblem(search.SearchProblem):
         self._node_corners = 0
         self.goal = {}
         self.goal_is = None
+        self.list = [0 0 0 0]
 
 
     def getStartState(self):
@@ -322,7 +323,7 @@ class CornersProblem(search.SearchProblem):
         """
         "*** YOUR CODE HERE ***"
         # print("pame", self.startingPosition)
-        return (self.startingPosition,0)
+        return (self.startingPosition, self.list)
         util.raiseNotDefined()
 
     def isGoalState(self, state):
@@ -331,9 +332,14 @@ class CornersProblem(search.SearchProblem):
         """
         "*** YOUR CODE HERE ***"
 
-        if len(self.goal) == len(self.corners) and self.goal_is == state[0]:
+        # if len(self.goal) == len(self.corners) and self.goal_is == state[0]:
+            # return True
+        num = 0
+        for i in self.list:
+            if self.list[i] == 1:
+                num =+ 1
+        if num == 4:
             return True
-            
         return False
         util.raiseNotDefined()
 
@@ -344,7 +350,7 @@ class CornersProblem(search.SearchProblem):
          As noted in search.py:
             For a given state, this should return a list of triples, (child,
             action, stepCost), where 'child' is a child to the current
-            state, 'action' is the action required to get there, and 'stepCost'
+            state, 'action' is the action req~uired to get there, and 'stepCost'
             is the incremental cost of expanding to that child
         """
         print("Father   ",state, "\n\n")
@@ -361,6 +367,7 @@ class CornersProblem(search.SearchProblem):
             print("CH ", nextState, end="   ")
             cost = self.getActionCost(state, action, nextState)
             children.append(( nextState, action, cost))
+    
         print(end="\n")
         self._expanded += 1 # DO NOT CHANGE
         
@@ -400,21 +407,24 @@ class CornersProblem(search.SearchProblem):
                 
                 if state_next not in self.goal:
                     self.goal[state_next] = True
-                    if len(self.goal) == len(self.corners):
-                        self.goal_is = state_next
+                    
+                    self.list.insert(len (self.goal),1)
+
+                    # if len(self.goal) == len(self.corners):
+                    #     self.goal_is = state_next
                 
                 
                 break
         
 
-        num = len(self.goal)
-        if num ==2 :
-            print(state_next, state)
-            util.raiseNotDefined()
+        # num = len(self.goal)
+        # if num ==2 :
+            # print(state_next, state)
+            # util.raiseNotDefined()
 
         # next_state = (state_n, num)
 
-        return ( state_next, num)
+        return ( state_next, self.list())
         util.raiseNotDefined()
 
 
