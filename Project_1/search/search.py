@@ -196,6 +196,7 @@ def depthFirstSearch(problem):
     util.raiseNotDefined()
 
 
+
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
@@ -207,6 +208,7 @@ def breadthFirstSearch(problem):
     queue = util.Queue()
 
     #for the start
+  
     visited[start] = True
     queue.push((start,"NULL"))
     exp = {}
@@ -267,7 +269,6 @@ def breadthFirstSearch(problem):
         for state_n,action_n,cost_n in list_with_child:
 
             if state_n == previous_state and previous_action == action_n:
-                print("gia patera", state, "  vrika ",previous_state,action_n,"\n\n")
                 Li.append(previous_action)
                 previous_state = state
                 previous_action = action
@@ -276,8 +277,6 @@ def breadthFirstSearch(problem):
 
         
         i = i + 1
-
-    print(Li)
     Li.reverse()
     return Li
     util.raiseNotDefined()
@@ -292,7 +291,6 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    
     start = problem.getStartState()
     visited = {}
 
@@ -307,19 +305,24 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     
     list_close = {}
     list_open = {}
+    # print("ela")
+
     list_open[start] = (0 + heuristic(start,problem), None, None)
+
+
     min_num = math.inf
     min_element = start
 
     #from the node where is expand(not double expand in one node)
     exp = {}
     Goal = None
+    
 
     while len(list_open) != 0:
 
         state_parent = min_element
         tup = list_open[state_parent]
-
+        
         if problem.isGoalState(state_parent) == True:
             Goal = state_parent
             list_close[state_parent] = tup 

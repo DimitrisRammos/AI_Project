@@ -41,6 +41,7 @@ from game import Actions
 import util
 import time
 import search
+import  math
 
 class GoWestAgent(Agent):
     "An agent that goes West until it can't."
@@ -313,7 +314,6 @@ class CornersProblem(search.SearchProblem):
         self._node_corners = 0
         self.goal = {}
         self.goal_is = None
-        self.list = [0 0 0 0]
 
 
     def getStartState(self):
@@ -322,8 +322,9 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        # print("pame", self.startingPosition)
-        return (self.startingPosition, self.list)
+        
+        return ( self.startingPosition, tuple([]) )
+
         util.raiseNotDefined()
 
     def isGoalState(self, state):
@@ -332,14 +333,18 @@ class CornersProblem(search.SearchProblem):
         """
         "*** YOUR CODE HERE ***"
 
-        # if len(self.goal) == len(self.corners) and self.goal_is == state[0]:
-            # return True
-        num = 0
-        for i in self.list:
-            if self.list[i] == 1:
-                num =+ 1
-        if num == 4:
-            return True
+
+        state_ = state[0]
+        List = list(state[1])
+
+        if state_ in self.corners:
+            if state_ not in List:
+                List.append(state_)
+            
+            size = len(List)
+            if size == 4:
+                return True
+
         return False
         util.raiseNotDefined()
 
@@ -350,10 +355,9 @@ class CornersProblem(search.SearchProblem):
          As noted in search.py:
             For a given state, this should return a list of triples, (child,
             action, stepCost), where 'child' is a child to the current
-            state, 'action' is the action req~uired to get there, and 'stepCost'
+            state, 'action' is the action required to get there, and 'stepCost'
             is the incremental cost of expanding to that child
         """
-        print("Father   ",state, "\n\n")
 
 
         children = []
@@ -364,11 +368,10 @@ class CornersProblem(search.SearchProblem):
 
 
             nextState = self.getNextState(state,action)
-            print("CH ", nextState, end="   ")
+            
             cost = self.getActionCost(state, action, nextState)
             children.append(( nextState, action, cost))
-    
-        print(end="\n")
+        
         self._expanded += 1 # DO NOT CHANGE
         
         return children
@@ -397,34 +400,16 @@ class CornersProblem(search.SearchProblem):
         nextx, nexty = int(x + dx), int(y + dy)
         "*** YOUR CODE HERE ***"
 
+        List = list(state[1])
+
         state_next = (nextx,nexty)
 
-        for i in range(4):
-            # print( self.corners[i])
-            if self.corners[i] == state_next:
-                # print(state, self._node_corners)
-                # isGoal = True
-                
-                if state_next not in self.goal:
-                    self.goal[state_next] = True
-                    
-                    self.list.insert(len (self.goal),1)
 
-                    # if len(self.goal) == len(self.corners):
-                    #     self.goal_is = state_next
-                
-                
-                break
-        
+        if state_next in self.corners:
+            if state_next not in List:
+                List.append( state_next)
+        return (state_next,tuple(List))
 
-        # num = len(self.goal)
-        # if num ==2 :
-            # print(state_next, state)
-            # util.raiseNotDefined()
-
-        # next_state = (state_n, num)
-
-        return ( state_next, self.list())
         util.raiseNotDefined()
 
 
@@ -457,9 +442,29 @@ def cornersHeuristic(state, problem):
     """
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
+    
+    node, visited = state[0], list(state[1])
+    min_path = 0
+    while len(visited) != 4:
+    
+        min_dist = math.inf
+        min_corner = None
+        for corner_1 in corners:
+            if corner_1 not in visited:
+                cost_dist = util.manhattanDistance(node,corner_1)
+                
+                if cost_dist < min_dist:
+                    min_dist = cost_dist
+                    min_corner = corner_1
+        
+        min_path += min_dist
+        node = min_corner
+        visited.append( node)
 
-    "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    
+    return min_path
+ 
+    # return 0 # Default to trivial solution
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -575,7 +580,38 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+
+    foodList = foodGrid.asList()
+    if foodList == []:
+        return 0
+
+    min_total_dist = math.inf
+    for food in foodList:
+
+        node = position
+        fList = list(foodList)
+        total_dist = util.manhattanDistance(node, food)
+        node = food
+        fList.remove(node)
+
+        while len( fList) != 0:
+            min_dist = math.inf
+            min_state_food = None
+
+            for f in fList:
+                dist = util.manhattanDistance( node, f)
+                if dist < min_dist:
+                        min_dist = dist
+                        min_state_food = f
+
+            total_dist += min_dist
+            node = min_state_food
+            fList.remove( node)
+        
+        if total_dist < min_total_dist:
+            min_total_dist = total_dist
+
+    return min_total_dist
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
