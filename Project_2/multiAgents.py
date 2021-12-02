@@ -18,6 +18,8 @@ import random, util
 
 from game import Agent
 
+import math
+
 class ReflexAgent(Agent):
     """
     A reflex agent chooses an action at each choice point by examining
@@ -72,15 +74,28 @@ class ReflexAgent(Agent):
         newFood = childGameState.getFood()
         newGhostStates = childGameState.getGhostStates()
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+        
+        min = -math.inf
+        max = math.inf
+        #if action is stop or the new state(new state is newPos) is hear one ghost(from table newGhostStates)
+        for Ghost in newGhostStates:
+            if Ghost.getPosition() == newPos:
+                return min
+        
+        if action == Directions.STOP:
+            return min
+        
+        #now all it's ok from ghost and action != STOP
+        #now will return th min distance from one food and new pos(but the min is the best)
+        foodList = newFood.asList()
+        mindistance = math.inf
+        
+        for food in foodList:
+            distance = util.manhattanDistance(food, newPos)
+            if distance <  mindistance:
+                mindistance = distance
 
-        "*** YOUR CODE HERE ***"
-        print( "child GAME S ", childGameState)
-        print( "NEW pos ", newPos)
-        print( "New food ", newFood)
-        print( "New ghosts ", newGhostStates)
-        print("new scared times ", newScaredTimes)
-        util.raiseNotDefined()
-        return childGameState.getScore()
+        return (1.0/mindistance)
 
 def scoreEvaluationFunction(currentGameState):
     """
@@ -141,8 +156,34 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
+        state = (gameState.getPacmanState()).getPosition()
+        print("ela ", state, self.depth);
+        
         util.raiseNotDefined()
-
+        
+    
+    def Min_Value( gamestate, state):
+        e = 1
+        return e
+        
+    def MinimaxDecision(gamestate, state):
+        max_action = None
+        max = -math.inf
+        agent_index = 0 
+        actions = gamestate.getLegalAction(agent_index)
+        for a in actions:
+            if a == Directions.STOP:
+                continue
+            state_new = gamestate.getNextState( agent_index,a)
+            price = Min_Value( gamestate, state_new)
+            if price > max:
+                max = price
+                max_action = a
+    
+    
+        
+        
+        
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
     Your minimax agent with alpha-beta pruning (question 3)
