@@ -158,27 +158,62 @@ class MinimaxAgent(MultiAgentSearchAgent):
         "*** YOUR CODE HERE ***"
         state = (gameState.getPacmanState()).getPosition()
         print("ela ", state, self.depth);
-        
+        self.MinimaxDecision(gameState, state)
+        print("offffff")
         util.raiseNotDefined()
         
     
-    def Min_Value( gamestate, state):
-        e = 1
-        return e
+    def Min_Value( self, gamestate, state, agent_index):
+
+        if self.depth == (agent_index+1):
+            price = self.evaluationFunction(gamestate) 
+            return price
         
-    def MinimaxDecision(gamestate, state):
+        min = math.inf
+        actions = gamestate.getLegalActions(agent_index)        
+        for a in actions:
+            state_next = gamestate.getNextState( agent_index, a)
+            price = self.Max_Value( gamestate, state_next, agent_index+1)
+            if price < min:
+                min = price
+        
+        print("min : ",min)
+        return min
+        
+    def Max_Value( self, gamestate, state, agent_index):
+    
+        if self.depth == (agent_index + 1):
+            price = self.evaluationFunction(gamestate) 
+            return price
+        
+        max = -math.inf
+        actions = gamestate.getLegalActions(agent_index)        
+        for a in actions:
+            state_next = gamestate.getNextState( agent_index, a)
+            price = self.Min_Value( gamestate, state_next, agent_index+1)
+            if price > max:
+                max = price
+        
+        return max
+        
+    def MinimaxDecision(self,gamestate, state):
+        print("opppppppppppp\n")
         max_action = None
         max = -math.inf
         agent_index = 0 
-        actions = gamestate.getLegalAction(agent_index)
+        actions = gamestate.getLegalActions(agent_index)
+        print( "eimai minimax ", agent_index)
         for a in actions:
             if a == Directions.STOP:
                 continue
-            state_new = gamestate.getNextState( agent_index,a)
-            price = Min_Value( gamestate, state_new)
+            
+            state_next = gamestate.getNextState( agent_index,a)
+            price = self.Min_Value( gamestate, state_next, agent_index+1)
             if price > max:
                 max = price
                 max_action = a
+                
+        return max_action
     
     
         
