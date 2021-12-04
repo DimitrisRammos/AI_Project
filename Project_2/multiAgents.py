@@ -156,65 +156,88 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        state = (gameState.getPacmanState()).getPosition()
-        print("ela ", state, self.depth);
-        self.MinimaxDecision(gameState, state)
-        print("offffff")
+        # gamestate = (gameState.getPacmanState()).getPosition()
+        agent_index = 0
+        depth = 0
+        price = self.MinimaxDecision(gameState, depth, agent_index)
+
+        return price
+        
         util.raiseNotDefined()
         
     
-    def Min_Value( self, gamestate, state, agent_index):
+    def Min_Value( self, gamestate, depth, agent_index):
 
-        if self.depth == (agent_index+1):
-            price = self.evaluationFunction(gamestate) 
-            return price
-        
         min = math.inf
         actions = gamestate.getLegalActions(agent_index)        
+
         for a in actions:
-            state_next = gamestate.getNextState( agent_index, a)
-            price = self.Max_Value( gamestate, state_next, agent_index+1)
-            if price < min:
-                min = price
-        
-        print("min : ",min)
-        return min
-        
-    def Max_Value( self, gamestate, state, agent_index):
-    
-        if self.depth == (agent_index + 1):
-            price = self.evaluationFunction(gamestate) 
-            return price
-        
-        max = -math.inf
-        actions = gamestate.getLegalActions(agent_index)        
-        for a in actions:
-            state_next = gamestate.getNextState( agent_index, a)
-            price = self.Min_Value( gamestate, state_next, agent_index+1)
-            if price > max:
-                max = price
-        
-        return max
-        
-    def MinimaxDecision(self,gamestate, state):
-        print("opppppppppppp\n")
-        max_action = None
-        max = -math.inf
-        agent_index = 0 
-        actions = gamestate.getLegalActions(agent_index)
-        print( "eimai minimax ", agent_index)
-        for a in actions:
+            
+            #if action is wall
             if a == Directions.STOP:
                 continue
             
-            state_next = gamestate.getNextState( agent_index,a)
-            price = self.Min_Value( gamestate, state_next, agent_index+1)
+            #next state continue the game
+            state_next = gamestate.getNextState( agent_index, a)
+            price = self.MinimaxDecision( state_next, depth, agent_index+1)
+            if price < min:
+                min = price
+        
+        return min
+    
+    
+        
+    def Max_Value( self, gamestate, depth,agent_index):
+    
+        max = -math.inf
+        max_action = None
+
+        actions = gamestate.getLegalActions(agent_index)        
+        for a in actions:
+            
+            #if action is wall
+            if a == Directions.STOP:
+                continue
+            
+            #next state continue the game
+            state_next = gamestate.getNextState( agent_index, a)
+            
+            price = self.MinimaxDecision(state_next,depth, agent_index+1)
             if price > max:
                 max = price
                 max_action = a
                 
-        return max_action
+        #if depth is zero return the max_action       
+        if depth == 0:
+            return max_action
+
+        return max
     
+    
+    def MinimaxDecision(self,gamestate,depth, agent_index):
+
+
+        max_action = None
+        max = -math.inf
+
+        #if agent_index is the max agent
+        if agent_index == gamestate.getNumAgents():
+            print(depth,self.depth)
+            agent_index = 0
+            depth = depth + 1
+            
+        if depth == self.depth:
+            return self.evaluationFunction( gamestate)
+            
+        if gamestate.isWin() or gamestate.isLose():
+            return self.evaluationFunction(gamestate)        
+
+        if agent_index == self.index:
+            return self.Max_Value( gamestate, depth,agent_index)
+        else:
+            return self.Min_Value( gamestate, depth,agent_index)
+            
+            
     
         
         
@@ -229,7 +252,107 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        
+        
+        agent_index = 0
+        depth = 0
+        a = -math.inf
+        b = math.inf
+        action = self.A_B_SEARCH(gameState, a, b, depth, agent_index)
+        return action
+                
+    
+    def Min_Value( self, gamestate, a, b, depth, agent_index):
+
+        min = math.inf
+
+        price = math.inf
+        actions = gamestate.getLegalActions(agent_index)        
+        
+        
+        for ac in actions:
+            
+            #if action is wall
+            if ac == Directions.STOP:
+                continue
+            
+            #next state continue the game
+            state_next = gamestate.getNextState( agent_index, ac)
+                
+            u = self.A_B_SEARCH( state_next, a, b, depth, agent_index+1)
+        
+            if u < price:
+                price = u
+            
+            if price < a:
+                return price
+            
+            if price < b:
+                b = price
+                    
+        return price
+    
+    
+        
+    def Max_Value( self, gamestate, a, b, depth,agent_index):
+    
+        price = -math.inf
+        price_action = None
+
+        actions = gamestate.getLegalActions(agent_index)   
+             
+        for ac in actions:
+            
+            #if action is wall
+            if ac == Directions.STOP:
+                continue
+            
+            #next state continue the game
+                       
+            state_next = gamestate.getNextState( agent_index, ac)
+            
+            u = self.A_B_SEARCH( state_next, a, b, depth, agent_index +1)
+
+            if u > price:
+                price = u
+                price_action = ac
+            
+        
+            if price > b:
+                return price
+            
+            if price > a:
+                a = price
+                
+        if depth == 0:
+            return price_action 
+
+        return price
+    
+    
+    
+    def A_B_SEARCH(self,gamestate, a, b, depth, agent_index):
+
+        #if agent_index is the max agent
+        if agent_index == gamestate.getNumAgents():
+            agent_index = 0
+            depth = depth + 1
+        
+    
+        if depth == self.depth:
+            return self.evaluationFunction( gamestate)
+            
+        if gamestate.isWin() or gamestate.isLose():
+            return self.evaluationFunction(gamestate)        
+
+        
+        if agent_index == self.index:
+            return self.Max_Value( gamestate,  a, b, depth, agent_index)
+        else:
+            return self.Min_Value( gamestate,  a, b, depth, agent_index)
+
+
+
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
