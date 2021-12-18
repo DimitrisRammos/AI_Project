@@ -94,6 +94,8 @@ class ReflexAgent(Agent):
         foodList = newFood.asList()
         mindistance = math.inf
         
+        #υπολογιζω την αποσταση καθε φαγητου με την θεση του πακμαν μεσω μανχαταν
+        #και διαιρωαυτο 1/αποσταση στο τελος ωστε να επιστρεψω το μεγαλυτερο
         for food in foodList:
             distance = util.manhattanDistance(food, newPos)
             if distance <  mindistance:
@@ -160,16 +162,18 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        # gamestate = (gameState.getPacmanState()).getPosition()
+        #καλω την αποφαση για μινιμαξ με agent_index = 0 
+        #αυτο σημαινει για το πακμαν 
+        #αρχικο βαθος 0 γιατι ειμαι στη κορυφη
         agent_index = 0
         depth = 0
-        price = self.MinimaxDecision(gameState, depth, agent_index)
+        action = self.MinimaxDecision(gameState, depth, agent_index)
 
-        return price
-        
-        util.raiseNotDefined()
-        
+        #return the action
+        return action
+                
     
+    #Min-value
     def Min_Value( self, gamestate, depth, agent_index):
 
         min = math.inf
@@ -187,10 +191,11 @@ class MinimaxAgent(MultiAgentSearchAgent):
             if price < min:
                 min = price
         
+        #return the min from the prices
         return min
     
     
-        
+    #max is the pacman player
     def Max_Value( self, gamestate, depth,agent_index):
     
         max = -math.inf
@@ -208,33 +213,37 @@ class MinimaxAgent(MultiAgentSearchAgent):
             
             price = self.MinimaxDecision(state_next,depth, agent_index+1)
             if price > max:
+                #take the price max
                 max = price
                 max_action = a
                 
         #if depth is zero return the max_action       
         if depth == 0:
             return max_action
-
+        #else return the max price
         return max
     
-    
+    #εδω η συναρτηση αυτη αποφασει για το ποια συναρτηση απο τις παραπανω θα καλεσουμε
+    # αν θα ειναι η μαξ ή η μιν
+    #η max ------> pacman
+    #h min ------> ghosts
     def MinimaxDecision(self,gamestate,depth, agent_index):
-
-
-        max_action = None
-        max = -math.inf
 
         #if agent_index is the max agent
         if agent_index == gamestate.getNumAgents():
             agent_index = 0
             depth = depth + 1
-            
+        
+        #το βαθος μας αρχιζει απο 0, αρα οταν φτασει το επιθυμητο κανουμε retun μμια τιμη
         if depth == self.depth:
             return self.evaluationFunction( gamestate)
-            
+        
+        #if i have result for the game    
         if gamestate.isWin() or gamestate.isLose():
             return self.evaluationFunction(gamestate)        
 
+        #αποφασιζουμε να γυρισουμε max if agent_idex = 0
+        #αλλθως min agent_index > 0 -----> ghosts
         if agent_index == self.index:
             return self.Max_Value( gamestate, depth,agent_index)
         else:
@@ -252,8 +261,9 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         "*** YOUR CODE HERE ***"
         
         
-        agent_index = 0
-        depth = 0
+        agent_index = 0 #gia pacman
+        depth = 0 #depth start from zero
+        #οριζω το a & b
         a = -math.inf
         b = math.inf
         action = self.A_B_SEARCH(gameState, a, b, depth, agent_index)
@@ -262,7 +272,6 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     
     def Min_Value( self, gamestate, a, b, depth, agent_index):
 
-        min = math.inf
 
         price = math.inf
         actions = gamestate.getLegalActions(agent_index)        
@@ -278,10 +287,11 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             state_next = gamestate.getNextState( agent_index, ac)
                 
             u = self.A_B_SEARCH( state_next, a, b, depth, agent_index+1)
-        
+            #κλαδευω αν χρειαζεται συμφωνα με αλγοριθμο
             if u < price:
                 price = u
-            
+                
+            #ελεγψω to a            
             if price < a:
                 return price
             
@@ -310,25 +320,28 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             state_next = gamestate.getNextState( agent_index, ac)
             
             u = self.A_B_SEARCH( state_next, a, b, depth, agent_index +1)
-
+            #κλαδευω αν χρειαζεται συμφωνα με αλγοριθμο
             if u > price:
                 price = u
                 price_action = ac
             
-        
+            #ελεγψω to b
             if price > b:
                 return price
             
             if price > a:
                 a = price
                 
+        #αν βαθος 0 τερματιζω
         if depth == 0:
             return price_action 
 
         return price
     
-    
-    
+    #εδω η συναρτηση αυτη αποφασει για το ποια συναρτηση απο τις παραπανω θα καλεσουμε
+    # αν θα ειναι η μαξ ή η μιν
+    #η max ------> pacman
+    #h min ------> ghosts
     def A_B_SEARCH(self,gamestate, a, b, depth, agent_index):
 
         #if agent_index is the max agent
@@ -336,14 +349,15 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             agent_index = 0
             depth = depth + 1
         
-    
+        #το βαθος μας αρχιζει απο 0, αρα οταν φτασει το επιθυμητο κανουμε retun μμια τιμη
         if depth == self.depth:
             return self.evaluationFunction( gamestate)
             
         if gamestate.isWin() or gamestate.isLose():
             return self.evaluationFunction(gamestate)        
 
-        
+        #αποφασιζουμε να γυρισουμε max if agent_idex = 0
+        #αλλθως min agent_index > 0 -----> ghosts
         if agent_index == self.index:
             return self.Max_Value( gamestate,  a, b, depth, agent_index)
         else:
@@ -363,14 +377,14 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         """
         "*** YOUR CODE HERE ***"
 
-        agent_index = 0
+        agent_index = 0 #agent_index start from the pacman
         depth = 0
         action = self.ExepticMax(gameState, depth, agent_index)
-
+        #return 
         return action
         
         
-    
+    #change for ghosts
     def Change( self, gamestate, depth, agent_index):
         
         sum = 0
@@ -388,6 +402,7 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
             sum = sum + price
             num = num + 1
         
+        #επιστρεφω το αθροισμα ολων δια το πληθος
         All = sum/num
         return All
     
@@ -407,6 +422,7 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
             #next state continue the game
             state_next = gamestate.getNextState( agent_index, a)
             
+            #βρισκω το μαξ            
             price = self.ExepticMax( state_next,depth, agent_index+1)
             if price > max:
                 max = price
@@ -418,7 +434,10 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
 
         return max
     
-    
+     #εδω η συναρτηση αυτη αποφασει για το ποια συναρτηση απο τις παραπανω θα καλεσουμε
+    # αν θα ειναι η μαξ ή η change
+    #η max ------> pacman
+    #h change ------> ghosts
     def ExepticMax(self,gamestate,depth, agent_index):
 
 
@@ -426,13 +445,18 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         if agent_index == gamestate.getNumAgents():
             agent_index = 0
             depth = depth + 1
-            
+        
+        #αν φτασω στο βαθος που θελω καθως
+        #ξεκιναω απο την κορυφη
         if depth == self.depth:
             return self.evaluationFunction( gamestate)
-            
+        
+        #αν εχω τελικο αποτελεσμα
         if gamestate.isWin() or gamestate.isLose():
             return self.evaluationFunction(gamestate)        
-
+        
+        #αποφασιζουμε να γυρισουμε max if agent_idex = 0
+        #αλλιως change agent_index > 0 -----> ghosts
         if agent_index == self.index:
             return self.Max( gamestate, depth,agent_index)
         else:
@@ -458,7 +482,8 @@ def betterEvaluationFunction(currentGameState):
     if lose == True:
         return -math.inf
     
- 
+    #υπολογιζω οπως q1 το μεγαλυτερο 1/αποσταση
+    #για την αποσταση καθε φαγητου με θεση πακμαν μεσω μανχατ
     foodList = currentGameState.getFood().asList()
     best_food = 0
     for food in foodList:
@@ -468,6 +493,8 @@ def betterEvaluationFunction(currentGameState):
 
     
     #cap
+    #παρομοια υπολογιζω και δω οπως με φαγητο
+    #αποσταση καψουλας με θεση πακμαν μεσω μανχατ
     best_cap = 0
     CapList = currentGameState.getCapsules()
     for cap in CapList:
@@ -476,6 +503,9 @@ def betterEvaluationFunction(currentGameState):
         best_cap = max( best_cap, distance)
 
     #Ghosts
+    #υπολογιζω και δω μεσω μανχατ την αποσταση του τερατος με το παγκαμαν
+    #και εξεταζω την ωρα φοβου του καθε τερατος αν ειναι θετικη ή οχι και αναλογα
+    #δινω τιμες στο score
     for ghost in currentGameState.getGhostStates():
         distane = manhattanDistance(currentGameState.getPacmanPosition(), ghost.getPosition())
 
@@ -491,28 +521,8 @@ def betterEvaluationFunction(currentGameState):
                 score = 0
     
     best_g = score   
+    #τελος επιστρεφω το αθροισμα ολων των παραπανων
     return (currentGameState.getScore() + best_cap + best_food + best_g )
-    util.raiseNotDefined()    
-
-    
-    def _scoreFromGhost(gameState):
-      score = 0
-      for ghost in gameState.getGhostStates():
-        disGhost = manhattanDistance(gameState.getPacmanPosition(), ghost.getPosition())
-        if ghost.scaredTimer > 0:
-          score += pow(max(8 - disGhost, 0), 2)
-        else:
-          score -= pow(max(7 - disGhost, 0), 2)
-      return score
-
-
-
-    score = currentGameState.getScore()
-    scoreGhosts = _scoreFromGhost(currentGameState)
-    scoreFood = _scoreFromFood(currentGameState)
-    scoreCapsules = _scoreFromCapsules(currentGameState)
-
-    return score + scoreGhosts + scoreFood + scoreCapsules
 
 # Abbreviation
 better = betterEvaluationFunction
