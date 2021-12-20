@@ -4,11 +4,11 @@ import csp
 #otan  vlepo lab na ftiaxno ekstra mathima poy prepei na bei meta toi theoria
 class BigProblem( csp.CSP):
     
-    def __init__(Eksamino, Name_Lessons, names_teachers, Duskolo, Lab):
+    def __init__( HalfYear, Name_Lessons, names_teachers, Duskolo, Lab):
         
         variables = []
-        domains = []
-        neighbors = []
+        domains = dict()
+        neighbors = dict()
         constraints = []
         size = len( Name_Lessons)
         for i in range(size):
@@ -31,10 +31,27 @@ class BigProblem( csp.CSP):
             SlotList.append( t2)
             SlotList.append( t3)
             
-        
+        #for domains
         for i in range(size):
             lesson = Name_Lessons[i]
+            halfyear = HalfYear[i]
+            Slot = []
+            for j in range(21):
+                t = SlotList[j]
+                Slot.append( t)
+                t = SlotList[j+1]
+                Slot.append( t)
+                if Lab[i] != True:
+                    t = SlotList[j+2]
+                    Slot.append( t)
+
+            domains[lesson] = Slot
+        print(domains)        
         
+        #####
+        # for j in range(size):
+                # if HalfYear[j] == halfyear:
+                     
         
         super().__init__(variables, domains, neighbors, constraints)
         
