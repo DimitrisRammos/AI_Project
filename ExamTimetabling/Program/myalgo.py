@@ -1,5 +1,63 @@
 import csp
+#mathomata me rergastirio h sto 1o slot h sto 2o slot
+#tha prepei na desmeysoyme to epomeno slot an 1o ------> 2o
+#otan  vlepo lab na ftiaxno ekstra mathima poy prepei na bei meta toi theoria
+class BigProblem( csp.CSP):
+    
+    def __init__(Eksamino, Name_Lessons, names_teachers, Duskolo, Lab):
+        
+        variables = []
+        domains = []
+        neighbors = []
+        constraints = []
+        size = len( Name_Lessons)
+        for i in range(size):
+            lesson = Name_Lessons[i]
+            variables.append( lesson)
+        
+        #exoume 21 meres
+        #me 3 slot kathe mera
+        #
+        #px 1h mera -> 9-12, 12-3, 3-6
+        #ara ena tuple (1, 9-12) (1, 12-3), (1, 3-6)
+        #to proto stoixeio toy tuple dhlonei poia mera tis eksetastikis kai to 2o poio slot
+        #ara 1...21 meres * 3 = 63 tuple synolika 
+        SlotList = []
+        for i in range( 21):
+            t1 = ( i, "9-12")
+            t2 = ( i, "12-3")
+            t3 = ( i, "3-6")
+            SlotList.append( t1)
+            SlotList.append( t2)
+            SlotList.append( t3)
+            
+        
+        for i in range(size):
+            lesson = Name_Lessons[i]
+        
+        
+        super().__init__(variables, domains, neighbors, constraints)
+        
+#variables v1...vl
+#domains d1....dn
 
+
+
+
+
+
+
+
+
+
+
+#############################################################################
+##                                                                         ##
+##                                                                         ##
+##                                kodikas                                  ##    
+##                                                                         ##
+##                                                                         ##
+#############################################################################
 with open("Files/" + "mathimata.csv") as file:
     lines = file.readlines()
 
@@ -56,3 +114,18 @@ for line in lines:
 
 for i in range( Number_lessons):
     print(Eksamino[i], Name_Lessons[i], names_teachers[i], Duskolo[i], Lab[i])
+    
+    
+#ok tora exo diavasei ta panta kai ta exo xorisei se pinakes
+# def __init__(self, variables, domains, neighbors, constraints):
+#  csp.CSP CS( variables, domains, neighbors, constraints)
+
+# A CSP is specified by the following inputs:
+#         variables   A list of variables; each is atomic (e.g. int or string).
+#         domains     A dict of {var:[possible_value, ...]} entries.
+#         neighbors   A dict of {var:[var,...]} that for each variable lists
+#                     the other variables that participate in constraints.
+#         constraints A function f(A, a, B, b) that returns true if neighbors
+#                     A, B satisfy the constraint when they have values A=a, B=b
+                    
+problem = BigProblem( Eksamino, Name_Lessons, names_teachers, Duskolo, Lab)

@@ -9,7 +9,7 @@ functions.
 import sys
 from collections import deque
 
-from utils import *
+from Program.utils import *
 
 
 class Problem:
