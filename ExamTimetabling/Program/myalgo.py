@@ -4,16 +4,34 @@ import csp
 #otan  vlepo lab na ftiaxno ekstra mathima poy prepei na bei meta toi theoria
 class BigProblem( csp.CSP):
     
-    def __init__( HalfYear, Name_Lessons, names_teachers, Duskolo, Lab):
+
+
+
+    # A CSP is specified by the following inputs:
+    #         variables   A list of variables; each is atomic (e.g. int or string).
+    #         domains     A dict of {var:[possible_value, ...]} entries.
+    #         neighbors   A dict of {var:[var,...]} that for each variable lists
+    #                     the other variables that participate in constraints.
+    #         constraints A function f(A, a, B, b) that returns true if neighbors
+    #                     A, B satisfy the constraint when they have values A=a, B=b
+    
+    def __init__( self, HalfYear, Name_Lessons, names_teachers, Hard, Lab):
         
-        variables = []
-        domains = dict()
-        neighbors = dict()
-        constraints = []
-        size = len( Name_Lessons)
-        for i in range(size):
+        self.variables = []
+        self.domains = dict()
+        self.neighbors = dict()
+
+        self.HalfYear = HalfYear
+        self.NameLessons = Name_Lessons
+        self.NameTeachers = names_teachers
+        self.Hard = Hard
+        self.Lab = Lab
+
+        self.size = len( Name_Lessons)
+
+        for i in range(self.size):
             lesson = Name_Lessons[i]
-            variables.append( lesson)
+            self.variables.append( lesson)
         
         #exoume 21 meres
         #me 3 slot kathe mera
@@ -31,10 +49,10 @@ class BigProblem( csp.CSP):
             SlotList.append( t2)
             SlotList.append( t3)
             
-        #for domains
-        for i in range(size):
+        #ftiaxno to domain
+        for i in range(self.size):
             lesson = Name_Lessons[i]
-            halfyear = HalfYear[i]
+
             Slot = []
             for j in range(21):
                 t = SlotList[j]
@@ -44,16 +62,132 @@ class BigProblem( csp.CSP):
                 if Lab[i] != True:
                     t = SlotList[j+2]
                     Slot.append( t)
+        
+            self.domains[ lesson] = Slot
+        
+        #pame na ftiaksoume kai to neig
+        for i in range(self.size):
+            
+            lesson = Name_Lessons[i]
+            neig = []
+            
+            halfyear = HalfYear[i]
+            hard = Hard[i]
+            teacher = names_teachers[i]
+            
+            for j in range(self.size):
 
-            domains[lesson] = Slot
-        print(domains)        
+                #an einai to idio mathima
+                #continue
+                if i == j:
+                    continue
+                
+                lesson_neig = Name_Lessons[j]
+                if HalfYear[j] == halfyear:
+                    #tote exoyn kapoio periorismo ara theoroyntai geitones gia kapoio logo
+                    neig.append( lesson_neig)
+                    continue                            #mporei na xoyn polloys periorismoys ta dyo mathimata enas arkei
+
+                if hard == True and Hard[j] == True:
+                    #an kai ta dyo dyskola tote einai hard kai ta dyo
+                    #ara exoyn kapoio periorismo
+                    neig.append(lesson_neig)
+                    continue                            #mporei na xoyn polloys periorismoys ta dyo mathimata enas arkei
+                
+                if teacher == names_teachers[j]:
+                    #exoyn idio kathigiti ara den prepei na nai tin idia mera eksetaseon
+                    #afoy ypagontai se kapoio periorismo
+                    #toys theoro geitones
+                    neig.append(lesson_neig)
+                    continue                            #mporei na xoyn polloys periorismoys ta dyo mathimata enas arkei
+            
+            self.neighbors[lesson] = neig
+
+
+        super().__init__(self.variables, self.domains, self.neighbors, self.variables_constraints)
+    
+    #constraints A function f(A, a, B, b) that returns true if neighbors
+    #            A, B satisfy the constraint when they have values A=a, B=b
+    def variables_constraits( self, A, a, B, b):
+
+
+        #an einai to idio variable tote return false
+        if A == B:
+            return False
         
-        #####
-        # for j in range(size):
-                # if HalfYear[j] == halfyear:
-                     
+        day_a = a[0]
+        day_b = b[0]
+        slot_a = a[1]
+        slot_b = b[1]
+        if (day_a == day_b) and (slot_a == slot_b):
+            return False
+
+        index_a = -1
+        index_b = -1
+        for i in range( self.size):
+            lesson = self.NameLessons[i]
+            if lesson == A:
+                index_a = i
+            elif lesson == B:
+                index_b = i
         
-        super().__init__(variables, domains, neighbors, constraints)
+        if index_a == -1 or index_b == -1:
+            return False
+        
+        #for halfyear
+        if self.HalfYear[index_a] == self.HalfYear[index_b]:
+            if day_a == day_b:
+                return False
+
+        #for hards lessons 2 days
+        if self.Hard[index_a] == True and self.Hard[index_b] == True:
+            days = abs( day_a - day_b)
+            if days < 2:
+                return False
+        
+        #for teacheres
+        if self.NameTeachers[index_a] == self.NameTeachers[index_b]:
+            if day_a == day_b:
+                return False
+        
+        #for slot_a
+        s_a = 0
+        if slot_a == "9-12":
+            s_a = 1
+        elif slot_a == "12-3":
+                s_a = 2
+        elif slot_a == "3-6":
+            s_a = 3
+        
+        #for slot_b
+        s_b = 0
+        if slot_b == "9-12":
+            s_b = 1
+        elif slot_b == "12-3":
+                s_b = 2
+        elif slot_b == "3-6":
+            s_b = 3    
+        
+        #tsekaro an exei lab to a kai meta to b eksetazetai
+        if self.Lab[index_a] == True:
+            if day_a == day_b:
+                if s_a + 1 == s_b:
+                    return False
+
+        #tsekaro an exei lab to b kai meta to a eksetazetai
+        if self.Lab[index_b] == True:
+            if day_a == day_b:
+                if s_b + 1 == s_a:
+                    return False
+
+        return True
+                
+        # if teacher == names_teachers[j]:
+            #exoyn idio kathigiti ara den prepei na nai tin idia mera eksetaseon
+            #afoy ypagontai se kapoio periorismo
+            #toys theoro geitones
+            # neig.append(lesson_neig)
+
         
 #variables v1...vl
 #domains d1....dn
