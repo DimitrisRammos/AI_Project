@@ -17,6 +17,15 @@ class BigProblem( csp.CSP):
     
     def __init__( self, HalfYear, Name_Lessons, names_teachers, Hard, Lab):
         
+        # print(HalfYear)
+        # print("\n\n")
+        # print(Name_Lessons)
+        # print("\n\n")
+        # print(names_teachers)
+        # print("\n\n")
+        # print(Hard)
+        # print("\n\n")
+        # print(Lab)
         self.variables = []
         self.domains = dict()
         self.neighbors = dict()
@@ -42,9 +51,9 @@ class BigProblem( csp.CSP):
         #ara 1...21 meres * 3 = 63 tuple synolika 
         SlotList = []
         for i in range( 21):
-            t1 = ( i, "9-12")
-            t2 = ( i, "12-3")
-            t3 = ( i, "3-6")
+            t1 = ( i+1, "9-12")
+            t2 = ( i+1, "12-3")
+            t3 = ( i+1, "3-6")
             SlotList.append( t1)
             SlotList.append( t2)
             SlotList.append( t3)
@@ -54,17 +63,23 @@ class BigProblem( csp.CSP):
             lesson = Name_Lessons[i]
 
             Slot = []
-            for j in range(21):
-                t = SlotList[j]
+            j = 0
+            while(j < 63):
+                
+                t = SlotList[j]                
                 Slot.append( t)
+
                 t = SlotList[j+1]
                 Slot.append( t)
-                if Lab[i] != True:
+                
+                if Lab[i] != "TRUE":
                     t = SlotList[j+2]
                     Slot.append( t)
-        
+
+                j = j + 3
+
             self.domains[ lesson] = Slot
-        
+
         #pame na ftiaksoume kai to neig
         for i in range(self.size):
             
@@ -88,7 +103,7 @@ class BigProblem( csp.CSP):
                     neig.append( lesson_neig)
                     continue                            #mporei na xoyn polloys periorismoys ta dyo mathimata enas arkei
 
-                if hard == True and Hard[j] == True:
+                if hard == "TRUE" and Hard[j] == "TRUE":
                     #an kai ta dyo dyskola tote einai hard kai ta dyo
                     #ara exoyn kapoio periorismo
                     neig.append(lesson_neig)
@@ -104,7 +119,7 @@ class BigProblem( csp.CSP):
             self.neighbors[lesson] = neig
 
 
-        super().__init__(self.variables, self.domains, self.neighbors, self.variables_constraints)
+        super().__init__(self.variables, self.domains, self.neighbors, self.variables_constraits)
     
     #constraints A function f(A, a, B, b) that returns true if neighbors
     #            A, B satisfy the constraint when they have values A=a, B=b
@@ -140,7 +155,7 @@ class BigProblem( csp.CSP):
                 return False
 
         #for hards lessons 2 days
-        if self.Hard[index_a] == True and self.Hard[index_b] == True:
+        if self.Hard[index_a] == "TRUE" and self.Hard[index_b] == "TRUE":
             days = abs( day_a - day_b)
             if days < 2:
                 return False
@@ -169,13 +184,13 @@ class BigProblem( csp.CSP):
             s_b = 3    
         
         #tsekaro an exei lab to a kai meta to b eksetazetai
-        if self.Lab[index_a] == True:
+        if self.Lab[index_a] == "TRUE":
             if day_a == day_b:
                 if s_a + 1 == s_b:
                     return False
 
         #tsekaro an exei lab to b kai meta to a eksetazetai
-        if self.Lab[index_b] == True:
+        if self.Lab[index_b] == "TRUE":
             if day_a == day_b:
                 if s_b + 1 == s_a:
                     return False
@@ -193,15 +208,6 @@ class BigProblem( csp.CSP):
 #domains d1....dn
 
 
-
-
-
-
-
-
-
-
-
 #############################################################################
 ##                                                                         ##
 ##                                                                         ##
@@ -209,74 +215,59 @@ class BigProblem( csp.CSP):
 ##                                                                         ##
 ##                                                                         ##
 #############################################################################
-with open("Files/" + "mathimata.csv") as file:
-    lines = file.readlines()
+if __name__ == '__main__':
+    with open("Files/" + "mathimata.csv") as file:
+        lines = file.readlines()
 
-Number_lessons = len(lines) -1 #beacause the first is information
-Name_Lessons = []
-names_teachers = []
-Eksamino = []
-Duskolo = []
-Lab = []
-is_the_first = True
-for line in lines:
-    
-    #beacause the first is information
-    if is_the_first == True:
-        is_the_first = False
-        continue
-    
-    line = line.strip()
-    length = len(line)
-    num_for_other = 0
-    previous_start = 0
-    
-    for i in range(length):
-        if line[i] == ",":
-            if num_for_other == 0 :
-                if previous_start == i-1:
-                   Eksamino.append( line[0])
-                else: 
-                    eksamino = int(line[previous_start:i-1])
-                    Eksamino.append(eksamino)
-            
-            elif num_for_other == 1:
-                
-                word = line[previous_start:i-1]
-                Name_Lessons.append(word)
-            
-            elif num_for_other == 2:
-                
-                word = line[previous_start:i-1]
-                names_teachers.append(word)
-            
-            elif num_for_other == 3:
-                
-                duskolo = bool(line[previous_start:i-1])
-                Duskolo.append(duskolo)
-                
-                lab = bool(line[i+1:length])
-                Lab.append( lab)
-                break
-                
-                
-            previous_start = i+1
-            num_for_other+=1
+    Number_lessons = len(lines) - 1  # beacause the first is information
+    Name_Lessons = []
+    names_teachers = []
+    Eksamino = []
+    Duskolo = []
+    Lab = []
+    is_the_first = True
+    for line in lines:
 
-for i in range( Number_lessons):
-    print(Eksamino[i], Name_Lessons[i], names_teachers[i], Duskolo[i], Lab[i])
-    
-    
-#ok tora exo diavasei ta panta kai ta exo xorisei se pinakes
-# def __init__(self, variables, domains, neighbors, constraints):
-#  csp.CSP CS( variables, domains, neighbors, constraints)
+        #beacause the first is information
+        if is_the_first == True:
+            is_the_first = False
+            continue
 
-# A CSP is specified by the following inputs:
-#         variables   A list of variables; each is atomic (e.g. int or string).
-#         domains     A dict of {var:[possible_value, ...]} entries.
-#         neighbors   A dict of {var:[var,...]} that for each variable lists
-#                     the other variables that participate in constraints.
-#         constraints A function f(A, a, B, b) that returns true if neighbors
-#                     A, B satisfy the constraint when they have values A=a, B=b
-                    
-problem = BigProblem( Eksamino, Name_Lessons, names_teachers, Duskolo, Lab)
+        line = line.strip()
+        length = len(line)
+        num_for_other = 0
+        previous_start = 0
+
+        for i in range(length):
+            if line[i] == ",":
+                if num_for_other == 0:
+                    if previous_start == i-1:
+                        Eksamino.append(line[0])
+                    else:
+                        eksamino = int(line[previous_start:i-1])
+                        Eksamino.append(eksamino)
+
+                elif num_for_other == 1:
+
+                    word = line[previous_start:i]
+                    Name_Lessons.append(word)
+
+                elif num_for_other == 2:
+
+                    word = line[previous_start:i]
+                    names_teachers.append(word)
+
+                elif num_for_other == 3:
+
+                    duskolo = line[previous_start:i]
+                    Duskolo.append(duskolo)
+
+                    lab = line[i+1:length]
+                    Lab.append(lab)
+                    break
+
+                previous_start = i+1
+                num_for_other += 1
+
+    problem = BigProblem(Eksamino, Name_Lessons, names_teachers, Duskolo, Lab)
+    print("all iok")
