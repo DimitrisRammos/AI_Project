@@ -17,15 +17,6 @@ class BigProblem( csp.CSP):
     
     def __init__( self, HalfYear, Name_Lessons, names_teachers, Hard, Lab):
         
-        # print(HalfYear)
-        # print("\n\n")
-        # print(Name_Lessons)
-        # print("\n\n")
-        # print(names_teachers)
-        # print("\n\n")
-        # print(Hard)
-        # print("\n\n")
-        # print(Lab)
         self.variables = []
         self.domains = dict()
         self.neighbors = dict()
@@ -63,7 +54,7 @@ class BigProblem( csp.CSP):
             lesson = Name_Lessons[i]
 
             Slot = []
-            j = 0
+            j = 0 
             while(j < 63):
                 
                 t = SlotList[j]                
@@ -86,9 +77,6 @@ class BigProblem( csp.CSP):
             lesson = Name_Lessons[i]
             neig = []
             
-            halfyear = HalfYear[i]
-            hard = Hard[i]
-            teacher = names_teachers[i]
             
             for j in range(self.size):
 
@@ -98,23 +86,8 @@ class BigProblem( csp.CSP):
                     continue
                 
                 lesson_neig = Name_Lessons[j]
-                if HalfYear[j] == halfyear:
-                    #tote exoyn kapoio periorismo ara theoroyntai geitones gia kapoio logo
-                    neig.append( lesson_neig)
-                    continue                            #mporei na xoyn polloys periorismoys ta dyo mathimata enas arkei
 
-                if hard == "TRUE" and Hard[j] == "TRUE":
-                    #an kai ta dyo dyskola tote einai hard kai ta dyo
-                    #ara exoyn kapoio periorismo
-                    neig.append(lesson_neig)
-                    continue                            #mporei na xoyn polloys periorismoys ta dyo mathimata enas arkei
-                
-                if teacher == names_teachers[j]:
-                    #exoyn idio kathigiti ara den prepei na nai tin idia mera eksetaseon
-                    #afoy ypagontai se kapoio periorismo
-                    #toys theoro geitones
-                    neig.append(lesson_neig)
-                    continue                            #mporei na xoyn polloys periorismoys ta dyo mathimata enas arkei
+                neig.append(lesson_neig)
             
             self.neighbors[lesson] = neig
 
@@ -124,7 +97,6 @@ class BigProblem( csp.CSP):
     #constraints A function f(A, a, B, b) that returns true if neighbors
     #            A, B satisfy the constraint when they have values A=a, B=b
     def variables_constraits( self, A, a, B, b):
-
 
         #an einai to idio variable tote return false
         if A == B:
@@ -196,17 +168,23 @@ class BigProblem( csp.CSP):
                     return False
 
         return True
-                
-        # if teacher == names_teachers[j]:
-            #exoyn idio kathigiti ara den prepei na nai tin idia mera eksetaseon
-            #afoy ypagontai se kapoio periorismo
-            #toys theoro geitones
-            # neig.append(lesson_neig)
 
+
+    def display(self, assignment):
+        print("The result is:\n\n")
         
-#variables v1...vl
-#domains d1....dn
-
+        if assignment == None:
+            print("We havn't result for exam timetabling")
+        else:
+            if(len(assignment) == 0):
+                print("We havn't result for exam timetabling")
+            else:
+                for i in assignment:
+                    day, slot = assignment.get(i)
+                    print(i," Day: ", day, " and Slot: ", slot)
+                    
+                
+        
 
 #############################################################################
 ##                                                                         ##
@@ -270,4 +248,7 @@ if __name__ == '__main__':
                 num_for_other += 1
 
     problem = BigProblem(Eksamino, Name_Lessons, names_teachers, Duskolo, Lab)
-    print("all iok")
+
+    csp.backtracking_search(problem)
+    problem.display(problem.infer_assignment())
+    
