@@ -3,7 +3,7 @@ This project is work from our fifth half year in https://www.di.uoa.gr/.
 
 ## Install
 
-git clone https://github.com/DimitrisRammos/AI_Project
+git clone https://github.com/DimitrisRammos/Artificial-Intelligence-Project
 
 ## Project_i ( i = 0,1,2) 
 
