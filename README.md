@@ -1,4 +1,4 @@
-# AI_Project
+# Artificial-Intelligence-Project
 This project is work from our fifth half year in https://www.di.uoa.gr/.
 
 ## Install
